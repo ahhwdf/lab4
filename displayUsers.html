@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profiles</title>
+</head>
+<body>
+    <h1>User Profiles</h1>
+    <div id="userList"></div>
+
+    <script>
+        fetch('userProfiles.json')
+            .then(response => response.json())
+            .then(users => {
+                let output = '';
+                users.forEach(user => {
+                    let { firstName, lastName, email, dateOfBirth, address, preferences } = user;
+                    let { theme, language, notifications, subscription } = preferences;
+                    let { street, city, state, zipCode } = address;
+
+                    output += `
+                        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+                            <p><strong>First Name:</strong> ${firstName}</p>
+                            <p><strong>Last Name:</strong> ${lastName}</p>
+                            <p><strong>Email:</strong> ${email}</p>
+                            <p><strong>Date of Birth:</strong> ${dateOfBirth}</p>
+                            <p><strong>Address:</strong> ${street}, ${city}, ${state}, ${zipCode}</p>
+                            <p><strong>Theme:</strong> ${theme} | <strong>Language:</strong> ${language} | <strong>Notifications:</strong> ${notifications} | <strong>Subscription:</strong> ${subscription}</p>
+                        </div>
+                    `;
+                });
+                document.getElementById('userList').innerHTML = output;
+            })
+            .catch(error => console.error('Error loading user data:', error));
+    </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Book Catalog - Display Books</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+        }
+        #bookList {
+            margin-top: 20px;
+        }
+        p {
+            background: #fff;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Book Catalog</h1>
+    <p>Below is a list of books loaded from the XML file (book.xml).</p>
+    <div id="bookList">
+        <p style="color: gray;">Loading books...</p>
+    </div>
+
+    <script>
+        fetch('book.xml') 
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error: ${response.status}`);
+                }
+                return response.text(); 
+            })
+            .then(data => {
+                let parser = new DOMParser();
+                let xmlDoc = parser.parseFromString(data, "text/xml");
+                let parserError = xmlDoc.getElementsByTagName("parsererror");
+                if (parserError.length > 0) {
+                    throw new Error("erro");
+                }
+
+                let books = xmlDoc.getElementsByTagName("book");
+                let output = '';
+
+                if (books.length === 0) {
+                    output = '<p style="color: orange;">Not Found</p>';
+                } else {
+                    for (let i = 0; i < books.length; i++) {
+                        let book = books[i];
+
+                        let id = book.getAttribute("id"); 
+                        let title = book.getElementsByTagName("title")[0]?.textContent || "N/A";
+                        let author = book.getElementsByTagName("author")[0]?.textContent || "N/A";
+                        let price = book.getElementsByTagName("price")[0]?.textContent || "N/A";
+
+                        output += `
+                            <p>
+                                <strong>ID:</strong> ${id} &nbsp;&nbsp;
+                                <strong>Title:</strong> ${title} &nbsp;&nbsp;
+                                <strong>Author:</strong> ${author} &nbsp;&nbsp;
+                                <strong>Price:</strong> $${price}
+                            </p>
+                        `;
+                    }
+                }
+
+                document.getElementById("bookList").innerHTML = output;
+            })
+            .catch(error => {
+                console.error(error);
+                document.getElementById("bookList").innerHTML = `
+                    <p style="color: red;">Loading failure: ${error.message}</p>
+                `;
+            });
+    </script>
+</body>
+</html>
